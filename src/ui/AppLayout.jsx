@@ -29,7 +29,6 @@ export default function AppLayout() {
             <Main>
                 <Container>
                     <Outlet />
-
                 </Container>
             </Main>
         </StyledAppLayout>

@@ -12,7 +12,7 @@ import FormRow from "../../ui/FormRow";
 import { useForm } from "react-hook-form";
 import { createEditCabin } from "../../services/apiCabins";
 
-function CreateCabinForm({ cabinToEdit = {} }) {
+function CreateCabinForm({ cabinToEdit = {}, onCloseModel }) {
     const { id: editId, ...editValues } = cabinToEdit
 
     const isEditSession = Boolean(editId)
@@ -32,6 +32,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
                 query: ["cabins"]
             }),
                 reset()
+            onCloseModel?.()
             toast.success("Cabin Created successfully")
         },
         onError: (error) => { toast.error(error.message) }
@@ -44,6 +45,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
                 query: ["cabins"]
             }),
                 reset()
+            onCloseModel?.()
             toast.success("Cabin successfully Edited")
         },
         onError: (error) => { toast.error(error.message) }
@@ -64,7 +66,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     }
     return (
         <>
-            <Form onSubmit={handleSubmit(onSubmit, onError)}>
+            <Form onSubmit={handleSubmit(onSubmit, onError)} type={onCloseModel ? "modal" : "regular"}>
                 <FormRow label="Cabin name" error={errors?.name?.message}>
                     <Input type="text" id="name" disabled={isWorking} {...register('name', {
                         required: "name field is required",
@@ -115,13 +117,13 @@ function CreateCabinForm({ cabinToEdit = {} }) {
                 </FormRow>
 
                 <FormRow>
-                    <Button variation="secondary" type="reset">
+                    <Button onClick={() => onCloseModel?.()} variation="secondary" type="reset">
                         Cancel
                     </Button>
                     <Button disabled={isWorking}>{isEditSession ? "Edit cabin" : "Create New Cabin"}</Button>
                 </FormRow>
             </Form>
-            <DevTool control={control} />
+            {/* <DevTool control={control} /> */}
         </>
     );
 }
