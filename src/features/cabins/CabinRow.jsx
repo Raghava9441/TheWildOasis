@@ -8,6 +8,8 @@ import CreateCabinForm from "./CreateCabinForm";
 import { HiSquare2Stack } from "react-icons/hi2";
 import { HiPencil } from "react-icons/hi2";
 import { HiTrash } from "react-icons/hi2";
+import Model from "../../ui/Modal";
+import ConfirmDelete from "../../ui/ConfirmDelete"
 const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -49,8 +51,6 @@ const Discount = styled.div`
 
 export default function CabinRow({ cabin }) {
   4
-  const [showForm, setshowForm] = useState(false)
-
   const { id: cabinId, name, maxCapacity, regularPrice, discount, image, description } = cabin
   const queryClint = useQueryClient()
   const { isLoading: isDeleting, mutate } = useMutation({
@@ -90,18 +90,26 @@ export default function CabinRow({ cabin }) {
         <Cabin>{name}</Cabin>
         <div>Fits ip tp {maxCapacity} guests</div>
         <Price>{formatCurrency(regularPrice)}</Price>
-        <Discount>{discount}</Discount>
+        <Discount>{formatCurrency(discount)}</Discount>
         <div>
-
-          <button onClick={() => setshowForm(show => !showForm)} disabled={isDeleting}><HiPencil /></button>
-          <button onClick={() => mutate(cabinId)} disabled={isDeleting}><HiTrash /></button>
           <button onClick={() => createCopy()} disabled={isCopying}><HiSquare2Stack /></button>
+          <Model>
+            <Model.Open opens="edit">
+              <button disabled={isDeleting}><HiPencil /></button>
+            </Model.Open>
+            <Model.Window name="edit">
+              <CreateCabinForm cabinToEdit={cabin} />
+            </Model.Window>
 
+            <Model.Open opens="delete">
+              <button disabled={isDeleting}><HiTrash /></button>
+            </Model.Open>
+            <Model.Window name="delete">
+              <ConfirmDelete resourceName="cabin" disabled={isDeleting} onConfirm={() => mutate(cabinId)} />
+            </Model.Window>
+          </Model>
         </div>
       </TableRow>
-      {
-        showForm && <CreateCabinForm cabinToEdit={cabin} />
-      }
     </>
   )
 }
