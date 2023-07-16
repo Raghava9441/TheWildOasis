@@ -10,6 +10,8 @@ import { HiPencil } from "react-icons/hi2";
 import { HiTrash } from "react-icons/hi2";
 import Model from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete"
+import Table from "../../ui/Table";
+import Menus from "../../ui/Menus";
 const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -50,66 +52,75 @@ const Discount = styled.div`
 `;
 
 export default function CabinRow({ cabin }) {
-  4
-  const { id: cabinId, name, maxCapacity, regularPrice, discount, image, description } = cabin
-  const queryClint = useQueryClient()
-  const { isLoading: isDeleting, mutate } = useMutation({
-    mutationFn: (id) => deleteCabin(id),
-    onSuccess: () => {
-      queryClint.invalidateQueries({
-        query: ["cabins"]
-      })
-      toast.success("Cabin deleted successfully")
-    },
-    onError: (error) => { toast.error(error.message) }
+    const { id: cabinId, name, maxCapacity, regularPrice, discount, image, description } = cabin
+    const queryClint = useQueryClient()
+    const { isLoading: isDeleting, mutate } = useMutation({
+        mutationFn: (id) => deleteCabin(id),
+        onSuccess: () => {
+            queryClint.invalidateQueries({
+                query: ["cabins"]
+            })
+            toast.success("Cabin deleted successfully")
+        },
+        onError: (error) => { toast.error(error.message) }
 
-  })
+    })
 
-  const { isLoading: isCopying, mutate: createCopy } = useMutation({
-    mutationFn: () => createEditCabin({
-      name: `${name} (Copy)`,
-      maxCapacity,
-      regularPrice,
-      discount,
-      description,
-      image
-    }),
-    onSuccess: () => {
-      queryClint.invalidateQueries({
-        query: ["cabins"]
-      })
-      toast.success("Cabin duplicated successfully")
-    },
-    onError: (error) => { toast.error(error.message) }
+    const { isLoading: isCopying, mutate: createCopy } = useMutation({
+        mutationFn: () => createEditCabin({
+            name: `${name} (Copy)`,
+            maxCapacity,
+            regularPrice,
+            discount,
+            description,
+            image
+        }),
+        onSuccess: () => {
+            queryClint.invalidateQueries({
+                query: ["cabins"]
+            })
+            toast.success("Cabin duplicated successfully")
+        },
+        onError: (error) => { toast.error(error.message) }
 
-  })
-  return (
-    <>
-      <TableRow role="row">
-        <Img src={image} />
-        <Cabin>{name}</Cabin>
-        <div>Fits ip tp {maxCapacity} guests</div>
-        <Price>{formatCurrency(regularPrice)}</Price>
-        <Discount>{formatCurrency(discount)}</Discount>
-        <div>
-          <button onClick={() => createCopy()} disabled={isCopying}><HiSquare2Stack /></button>
-          <Model>
-            <Model.Open opens="edit">
-              <button disabled={isDeleting}><HiPencil /></button>
-            </Model.Open>
-            <Model.Window name="edit">
-              <CreateCabinForm cabinToEdit={cabin} />
-            </Model.Window>
+    })
+    return (
+        <>
+            <Table.Row role="row">
+                <Img src={image} />
+                <Cabin>{name}</Cabin>
+                <div>Fits ip tp {maxCapacity} guests</div>
+                <Price>{formatCurrency(regularPrice)}</Price>
+                <Discount>{formatCurrency(discount)}</Discount>
+                <div>
+                    <Model>
+                        <Menus>
+                            <Menus.Toggle id={cabinId} />
+                            <Menus.List id={cabinId} >
+                                <Menus.Button onClick={() => createCopy()} icon={<HiSquare2Stack />} >Duplicate</Menus.Button>
 
-            <Model.Open opens="delete">
-              <button disabled={isDeleting}><HiTrash /></button>
-            </Model.Open>
-            <Model.Window name="delete">
-              <ConfirmDelete resourceName="cabin" disabled={isDeleting} onConfirm={() => mutate(cabinId)} />
-            </Model.Window>
-          </Model>
-        </div>
-      </TableRow>
-    </>
-  )
+                                <Model.Open opens="edit">
+                                    <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+                                </Model.Open>
+
+                                <Model.Open opens="delete">
+                                    <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+                                </Model.Open>
+                            </Menus.List>
+                        </Menus>
+
+                        <Model.Window name="edit">
+                            <CreateCabinForm cabinToEdit={cabin} />
+                        </Model.Window>
+
+                        <Model.Window name="delete">
+                            <ConfirmDelete resourceName="cabin" disabled={isDeleting} onConfirm={() => mutate(cabinId)} />
+                        </Model.Window>
+
+                    </Model>
+
+                </div>
+            </Table.Row>
+        </>
+    )
 }

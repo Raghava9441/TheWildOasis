@@ -1,19 +1,19 @@
-import React, { useState } from 'react'
-import Button from '../../ui/Button'
-import CreateCabinForm from './CreateCabinForm'
-import Model from '../../ui/Modal'
+import React from 'react';
+import Button from '../../ui/Button';
+import CreateCabinForm from './CreateCabinForm';
+import Modal from '../../ui/Modal';
 
 export default function AddCabin() {
     return (
-        <div>
-            <Model>
-                <Model.Open opens="cabin-form">
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "flex-end" }}>
+            <Modal>
+                <Modal.Open opens="cabin-form">
                     <Button>Add new cabin</Button>
-                </Model.Open>
-                <Model.Window name="cabin-form">
+                </Modal.Open>
+                <Modal.Window name="cabin-form">
                     <CreateCabinForm />
-                </Model.Window>
-            </Model>
+                </Modal.Window>
+            </Modal>
         </div>
-    )
+    );
 }

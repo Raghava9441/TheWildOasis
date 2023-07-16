@@ -55,7 +55,7 @@ const Button = styled.button`
 
 const ModalContext = createContext()
 
-function Model({ children }) {
+function Modal({ children }) {
   const [openName, setOpenName] = useState("");
   const open = (name) => setOpenName(name);
   const close = () => setOpenName("")
@@ -91,6 +91,6 @@ function Window({ children, name }) {
     document.body
   )
 }
-Model.Open = Open
-Model.Window = Window
-export default Model
+Modal.Open = Open
+Modal.Window = Window
+export default Modal

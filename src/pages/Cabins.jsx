@@ -9,10 +9,10 @@ function Cabins() {
         <>
             <Row type="horizontal">
                 <Heading as="h1">All cabins</Heading>
-                <AddCabin />
                 <p>Filter/Sort</p>
             </Row>
             <Row>
+                <AddCabin />
                 <CabinTable />
             </Row>
         </>
