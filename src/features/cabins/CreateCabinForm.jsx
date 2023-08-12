@@ -98,7 +98,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModel }) {
                     <Input type="number" id="discount" defaultValue={0} disabled={isWorking} {...register("discount", {
                         required: "This field is required",
                         validate: (value) =>
-                            value <= getValues().regularPrice ||
+                            value < getValues().regularPrice ||
                             "Discount should be less than regular price",
                     })}
                     />
