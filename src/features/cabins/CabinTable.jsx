@@ -9,11 +9,11 @@ import { useSearchParams } from "react-router-dom";
 
 /**
  * Renders a table of cabins with filtering options.
- * 
+ *
  * The CabinTable component fetches cabin data from an API using the useQuery hook from the @tanstack/react-query library.
  * The fetched data is then filtered based on a search parameter and rendered as rows in the table.
  * The component also includes functionality for deleting and duplicating cabins.
- * 
+ *
  * @returns {JSX.Element} The rendered CabinTable component.
  */
 export default function CabinTable() {
@@ -29,6 +29,7 @@ export default function CabinTable() {
 
   if (isLoading) return <Spinner />;
 
+  //filter
   const filterValue = searchParams.get("discount") || "all";
 
   let filteredCabins;
@@ -47,6 +48,15 @@ export default function CabinTable() {
       break;
   }
 
+  //sort
+  const sortValue = searchParams.get("sortBy") || "sortDate-asc";
+
+  const [field, direction] = sortValue.split("-");
+  const modifier = direction === "asc" ? 1 : -1;
+  const sortedcabins = filteredCabins.sort(
+    (a, b) => (a[field] - b[field]) * modifier
+  );
+
   return (
     <Menus>
       <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr 1fr">
@@ -59,7 +69,7 @@ export default function CabinTable() {
           <div></div>
         </Table.Header>
         <Table.Body
-          data={filteredCabins}
+          data={sortedcabins}
           render={(cabin) => <CabinRow cabin={cabin} key={cabin.id} />}
         />
         {/* {cabins.map((cabin) => (
