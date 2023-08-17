@@ -72,9 +72,9 @@ export default function CabinTable() {
           data={sortedcabins}
           render={(cabin) => <CabinRow cabin={cabin} key={cabin.id} />}
         />
-        {/* {cabins.map((cabin) => (
+        {cabins.map((cabin) => (
           <CabinRow cabin={cabin} key={cabin.id} />
-        ))} */}
+        ))}
       </Table>
     </Menus>
   );

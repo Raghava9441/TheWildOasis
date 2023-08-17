@@ -2,34 +2,51 @@ import BookingRow from "./BookingRow";
 import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
 import Empty from "../../ui/Empty";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBookings } from "../../services/apiBookings";
 import Spinner from "../../ui/Spinner";
 import Pagination from "../../ui/Pagination";
 import { useSearchParams } from "react-router-dom";
+import { PAGE_SIZE } from "../../utils/constants";
 
 function BookingTable() {
+  const queryClint = useQueryClient();
   const [searchParams] = useSearchParams();
-  const filterValue = searchParams.get("status") || "all";
+
+  const filterValue = searchParams.get("status");
 
   const filter =
     !filterValue || filterValue === "all"
       ? null
-      : { field: "status", value: filterValue,method:"gte" };
+      : { field: "status", value: filterValue, method: "eq" };
+
+  const sortByRaw = searchParams.get("sortBy") || "startDate-desc";
+  const [field, direction] = sortByRaw.split("-");
+  const sortBy = { field, direction };
+
+  const page = !searchParams.get("page") ? 1 : Number(searchParams.get("page"));
 
   const {
     isLoading,
-    data: bookings,
+    data: responseData,
     error,
     isFetched,
   } = useQuery({
-    queryKey: ["bookings", filter],
-    queryFn: () => getBookings({ filter }),
+    queryKey: ["bookings", filter, sortBy, page],
+    queryFn: () => getBookings({ filter, sortBy, page }),
   });
+  const { data: bookings = [], count } = responseData || {};
+
+  const pageCount = Math.ceil(count / PAGE_SIZE);
+  if (page < pageCount)
+    queryClint.prefetchQuery({
+      queryKey: ["bookings", filter, sortBy, page + 1],
+      queryFn: () => getBookings({ filter, sortBy, page: page + 1 }),
+    });
 
   if (isLoading) return <Spinner />;
 
-  if (!bookings.length) return <Empty resource="Bookings" />;
+  if (!bookings || bookings.length === 0) return <Empty resource="Bookings" />;
 
   return (
     <Menus>
@@ -49,7 +66,9 @@ function BookingTable() {
             <BookingRow key={booking.id} booking={booking} />
           )}
         />
-        <Table.Footer>{/* <Pagination count={15} /> */}</Table.Footer>
+        <Table.Footer>
+          <Pagination count={count} />
+        </Table.Footer>
       </Table>
     </Menus>
   );
