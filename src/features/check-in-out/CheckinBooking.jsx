@@ -52,16 +52,6 @@ function CheckinBooking() {
     }, [bookingData])
 
 
-    const {
-        id: bookingId,
-        guests,
-        totalPrice,
-        numGuests,
-        hasBreakfast,
-        numNights,
-    } = bookingData;
-
-
     const { isLoading: isCheckingIn, mutate: checkin } = useMutation({
         mutationFn: () => updateBooking(bookingId, { status: 'checked-in', isPaid: true }),
         onSuccess: (data) => {
@@ -77,6 +67,15 @@ function CheckinBooking() {
     if (isLoading || isSettingLoading) return <Spinner />
 
     if (error) return <div>Error: {error.message}</div>;
+
+    const {
+        id: bookingId,
+        guests,
+        totalPrice,
+        numGuests,
+        hasBreakfast,
+        numNights,
+    } = bookingData;
 
     const optionalBreakfastPrice = settings?.breakfastPrice * numGuests * numNights
     return (
