@@ -17,6 +17,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { formatCurrency } from "../../utils/helpers";
 import { toast } from "react-hot-toast";
+import { useSettings } from "../settings/useSettings";
 
 const Box = styled.div`
   /* Box */
@@ -30,6 +31,8 @@ function CheckinBooking() {
     const queryClient = useQueryClient();
     const navigate = useNavigate()
     const [confirmPaid, setconfirmPaid] = useState(false)
+    const [addBreakfast, setAddBreakfast] = useState(false)
+    const { isLoading: isSettingLoading, error: settingsError, settings } = useSettings();
 
     const moveBack = useMoveBack();
 
@@ -48,9 +51,6 @@ function CheckinBooking() {
         setconfirmPaid(bookingData?.isPaid || false)
     }, [bookingData])
 
-    if (isLoading) return <Spinner />
-
-    if (error) return <div>Error: {error.message}</div>;
 
     const {
         id: bookingId,
@@ -61,20 +61,24 @@ function CheckinBooking() {
         numNights,
     } = bookingData;
 
-    const { mutate: checkin, isLoading: isCheckingIn } = useMutation({
-        mutationFn: () => {
-            updateBooking(bookingId, { status: 'checked-in', isPaid: true })
-        },
+
+    const { isLoading: isCheckingIn, mutate: checkin } = useMutation({
+        mutationFn: () => updateBooking(bookingId, { status: 'checked-in', isPaid: true }),
         onSuccess: (data) => {
+            queryClient.invalidateQueries({
+                query: ["bookings"]
+            })
             toast.success(`Booking # ${data?.id} successfully checked in`);
-            queryClient.invalidateQueries({ active: true });
             navigate("/")
         },
-        onError: () => {
-            toast.error("there was an error while checking in")
-        }
+        onError: (error) => toast.error("there was an error while checking in")
     })
 
+    if (isLoading || isSettingLoading) return <Spinner />
+
+    if (error) return <div>Error: {error.message}</div>;
+
+    const optionalBreakfastPrice = settings?.breakfastPrice * numGuests * numNights
     return (
         <>
             <Row type="horizontal">
@@ -83,9 +87,28 @@ function CheckinBooking() {
             </Row>
 
             <BookingDataBox booking={bookingData} />
+
+            {!hasBreakfast && <Box>
+                <Checkbox
+                    checked={addBreakfast}
+                    disabled={addBreakfast}
+                    onChange={() => { setAddBreakfast((add) => !add); setconfirmPaid(false); }}
+                    id="breakfast">
+                    want to add the breakfast for {formatCurrency(optionalBreakfastPrice)}?
+                </Checkbox>
+            </Box>}
             <Box>
-                <Checkbox checked={confirmPaid} disabled={confirmPaid} onChange={() => setconfirmPaid((confirm) => !confirmPaid)} id="confirm">i confirm that {guests.fullName} has paid the total amount {formatCurrency(totalPrice)}</Checkbox>
+                <Checkbox
+                    checked={confirmPaid}
+                    disabled={confirmPaid}
+                    onChange={() => setconfirmPaid((confirm) => !confirmPaid)}
+                    id="confirm">
+                    i confirm that {guests.fullName} has paid the total amount {!optionalBreakfastPrice
+                        ? formatCurrency(totalPrice)
+                        : `${formatCurrency(totalPrice + optionalBreakfastPrice)}(${formatCurrency(totalPrice)}+${formatCurrency(optionalBreakfastPrice)})`}
+                </Checkbox>
             </Box>
+
             <ButtonGroup>
                 <Button onClick={checkin} disabled={!confirmPaid} isLoading={isCheckingIn}>Check in booking #{bookingId}</Button>
                 <Button variation="secondary" onClick={moveBack}>
