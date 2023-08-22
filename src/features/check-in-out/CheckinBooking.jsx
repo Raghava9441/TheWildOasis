@@ -6,8 +6,17 @@ import Heading from "../../ui/Heading";
 import ButtonGroup from "../../ui/ButtonGroup";
 import Button from "../../ui/Button";
 import ButtonText from "../../ui/ButtonText";
+import Checkbox from "../../ui/Checkbox";
 
 import { useMoveBack } from "../../hooks/useMoveBack";
+import { getBooking, updateBooking } from "../../services/apiBookings";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Spinner from "../../ui/Spinner";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useEffect } from "react";
+import { formatCurrency } from "../../utils/helpers";
+import { toast } from "react-hot-toast";
 
 const Box = styled.div`
   /* Box */
@@ -18,38 +27,73 @@ const Box = styled.div`
 `;
 
 function CheckinBooking() {
-  const moveBack = useMoveBack();
+    const queryClient = useQueryClient();
+    const navigate = useNavigate()
+    const [confirmPaid, setconfirmPaid] = useState(false)
 
-  const booking = {};
+    const moveBack = useMoveBack();
 
-  const {
-    id: bookingId,
-    guests,
-    totalPrice,
-    numGuests,
-    hasBreakfast,
-    numNights,
-  } = booking;
+    const { bookingId: Id } = useParams()
 
-  function handleCheckin() {}
+    const {
+        isLoading,
+        data: bookingData,
+        error,
+    } = useQuery({
+        queryKey: ["booking"],
+        queryFn: () => getBooking(Id),
+    });
 
-  return (
-    <>
-      <Row type="horizontal">
-        <Heading as="h1">Check in booking #{bookingId}</Heading>
-        <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
-      </Row>
+    useEffect(() => {
+        setconfirmPaid(bookingData?.isPaid || false)
+    }, [bookingData])
 
-      <BookingDataBox booking={booking} />
+    if (isLoading) return <Spinner />
 
-      <ButtonGroup>
-        <Button onClick={handleCheckin}>Check in booking #{bookingId}</Button>
-        <Button variation="secondary" onClick={moveBack}>
-          Back
-        </Button>
-      </ButtonGroup>
-    </>
-  );
+    if (error) return <div>Error: {error.message}</div>;
+
+    const {
+        id: bookingId,
+        guests,
+        totalPrice,
+        numGuests,
+        hasBreakfast,
+        numNights,
+    } = bookingData;
+
+    const { mutate: checkin, isLoading: isCheckingIn } = useMutation({
+        mutationFn: () => {
+            updateBooking(bookingId, { status: 'checked-in', isPaid: true })
+        },
+        onSuccess: (data) => {
+            toast.success(`Booking # ${data?.id} successfully checked in`);
+            queryClient.invalidateQueries({ active: true });
+            navigate("/")
+        },
+        onError: () => {
+            toast.error("there was an error while checking in")
+        }
+    })
+
+    return (
+        <>
+            <Row type="horizontal">
+                <Heading as="h1">Check in booking #{bookingId}</Heading>
+                <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
+            </Row>
+
+            <BookingDataBox booking={bookingData} />
+            <Box>
+                <Checkbox checked={confirmPaid} disabled={confirmPaid} onChange={() => setconfirmPaid((confirm) => !confirmPaid)} id="confirm">i confirm that {guests.fullName} has paid the total amount {formatCurrency(totalPrice)}</Checkbox>
+            </Box>
+            <ButtonGroup>
+                <Button onClick={checkin} disabled={!confirmPaid} isLoading={isCheckingIn}>Check in booking #{bookingId}</Button>
+                <Button variation="secondary" onClick={moveBack}>
+                    Back
+                </Button>
+            </ButtonGroup>
+        </>
+    );
 }
 
 export default CheckinBooking;

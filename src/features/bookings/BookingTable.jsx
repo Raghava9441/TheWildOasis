@@ -43,6 +43,12 @@ function BookingTable() {
       queryKey: ["bookings", filter, sortBy, page + 1],
       queryFn: () => getBookings({ filter, sortBy, page: page + 1 }),
     });
+    
+  if (page > 1)
+    queryClint.prefetchQuery({
+      queryKey: ["bookings", filter, sortBy, page - 1],
+      queryFn: () => getBookings({ filter, sortBy, page: page - 1 }),
+    });
 
   if (isLoading) return <Spinner />;
 

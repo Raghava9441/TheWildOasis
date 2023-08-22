@@ -38,6 +38,7 @@ export async function getBooking(id) {
     .select("*, cabins(*), guests(*)")
     .eq("id", id)
     .single();
+  console.log("data:", data)
 
   if (error) {
     console.error(error);
