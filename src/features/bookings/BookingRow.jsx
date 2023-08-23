@@ -7,8 +7,12 @@ import Table from "../../ui/Table";
 import { formatCurrency } from "../../utils/helpers";
 import { formatDistanceFromNow } from "../../utils/helpers";
 import Menus from "../../ui/Menus";
-import { HiArrowDownOnSquare, HiEye } from "react-icons/hi2";
+import { HiArrowDownOnSquare, HiArrowUpOnSquare, HiEye } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateBooking } from "../../services/apiBookings";
+import { toast } from "react-hot-toast";
+import Spinner from "../../ui/Spinner";
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -38,73 +42,96 @@ const Amount = styled.div`
 `;
 
 function BookingRow({
-  booking: {
-    id: bookingId,
-    created_at,
-    startDate,
-    endDate,
-    numNights,
-    numGuests,
-    totalPrice,
-    status,
-    guests: { fullName: guestName, email },
-    cabins: { name: cabinName },
-  },
+    booking: {
+        id: bookingId,
+        created_at,
+        startDate,
+        endDate,
+        numNights,
+        numGuests,
+        totalPrice,
+        status,
+        guests: { fullName: guestName, email },
+        cabins: { name: cabinName },
+    },
 }) {
-  const statusToTagName = {
-    unconfirmed: "blue",
-    "checked-in": "green",
-    "checked-out": "silver",
-  };
-  const navigate = useNavigate();
+    const statusToTagName = {
+        unconfirmed: "blue",
+        "checked-in": "green",
+        "checked-out": "silver",
+    };
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
 
-  return (
-    <Table.Row>
-      <Cabin>{cabinName}</Cabin>
+    const { isLoading: isCheckingOut, mutate: CheckOut } = useMutation({
+        mutationFn: (bookingId) => updateBooking(bookingId, { status: 'checked-out', }),
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({
+                query: ["bookings"]
+            })
+            toast.success(`Booking # ${data?.id} successfully checked out`);
+        },
+        onError: (error) => toast.error("there was an error while checking out")
+    })
 
-      <Stacked>
-        <span>{guestName}</span>
-        <span>{email}</span>
-      </Stacked>
 
-      <Stacked>
-        <span>
-          {isToday(new Date(startDate))
-            ? "Today"
-            : formatDistanceFromNow(startDate)}{" "}
-          &rarr; {numNights} night stay
-        </span>
-        <span>
-          {format(new Date(startDate), "MMM dd yyyy")} &mdash;{" "}
-          {format(new Date(endDate), "MMM dd yyyy")}
-        </span>
-      </Stacked>
 
-      <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
+    return (
+        <Table.Row>
+            <Cabin>{cabinName}</Cabin>
 
-      <Amount>{formatCurrency(totalPrice)}</Amount>
+            <Stacked>
+                <span>{guestName}</span>
+                <span>{email}</span>
+            </Stacked>
 
-      <Menus.Menu>
-        <Menus.Toggle id={bookingId} />
-        <Menus.List id={bookingId}>
-          <Menus.Button
-            icon={<HiEye />}
-            onClick={() => navigate(`/bookings/${bookingId}`)}
-          >
-            See Details
-          </Menus.Button>
-          {
-            status === "unconfirmed" && <Menus.Button
-              icon={<HiArrowDownOnSquare />}
-              onClick={() => navigate(`/checkin/${bookingId}`)}
-            >
-              Check In
-            </Menus.Button>
-          }
-        </Menus.List>
-      </Menus.Menu>
-    </Table.Row>
-  );
+            <Stacked>
+                <span>
+                    {isToday(new Date(startDate))
+                        ? "Today"
+                        : formatDistanceFromNow(startDate)}{" "}
+                    &rarr; {numNights} night stay
+                </span>
+                <span>
+                    {format(new Date(startDate), "MMM dd yyyy")} &mdash;{" "}
+                    {format(new Date(endDate), "MMM dd yyyy")}
+                </span>
+            </Stacked>
+
+            <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
+
+            <Amount>{formatCurrency(totalPrice)}</Amount>
+
+            <Menus.Menu>
+                <Menus.Toggle id={bookingId} />
+                <Menus.List id={bookingId}>
+                    <Menus.Button
+                        icon={<HiEye />}
+                        onClick={() => navigate(`/bookings/${bookingId}`)}
+                    >
+                        See Details
+                    </Menus.Button>
+                    {
+                        status === "unconfirmed" && <Menus.Button
+                            icon={<HiArrowDownOnSquare />}
+                            onClick={() => navigate(`/checkin/${bookingId}`)}
+                        >
+                            Check In
+                        </Menus.Button>
+                    }
+                    {
+                        status === "checked-in" && <Menus.Button
+                            icon={<HiArrowUpOnSquare />}
+                            onClick={() => CheckOut(bookingId)}
+                            disabled={isCheckingOut}
+                        >
+                            Check Out
+                        </Menus.Button>
+                    }
+                </Menus.List>
+            </Menus.Menu>
+        </Table.Row>
+    );
 }
 
 export default BookingRow;

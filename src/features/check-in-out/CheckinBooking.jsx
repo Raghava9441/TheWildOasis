@@ -27,6 +27,12 @@ const Box = styled.div`
   padding: 2.4rem 4rem;
 `;
 
+/**
+ * The `CheckinBooking` function is responsible for handling the check-in process for a booking.
+ * It retrieves the booking data, allows the user to add breakfast and confirm payment,
+ * and then updates the booking status to "checked-in" if all conditions are met.
+ */
+
 function CheckinBooking() {
     const queryClient = useQueryClient();
     const navigate = useNavigate()
@@ -38,6 +44,7 @@ function CheckinBooking() {
 
     const { bookingId: Id } = useParams()
 
+    // Fetch booking data using a query
     const {
         isLoading,
         data: bookingData,
@@ -47,11 +54,12 @@ function CheckinBooking() {
         queryFn: () => getBooking(Id),
     });
 
+    // Update 'confirmPaid' state when bookingData changes
     useEffect(() => {
         setconfirmPaid(bookingData?.isPaid || false)
     }, [bookingData])
 
-
+    // Mutation hook for updating booking status
     const { isLoading: isCheckingIn, mutate: checkin } = useMutation({
         mutationFn: ({ bookingId, breakfast }) => updateBooking(bookingId, { status: 'checked-in', isPaid: true, ...breakfast }),
         onSuccess: (data) => {
@@ -64,10 +72,16 @@ function CheckinBooking() {
         onError: (error) => toast.error("there was an error while checking in")
     })
 
+
+
+
+    // Render loading spinner while data is loading
     if (isLoading || isSettingLoading) return <Spinner />
 
+    // Render error message if there's an error
     if (error) return <div>Error: {error.message}</div>;
 
+    // Extract relevant data from bookingData
     const {
         id: bookingId,
         guests,
@@ -77,10 +91,13 @@ function CheckinBooking() {
         numNights,
     } = bookingData;
 
+    // Calculate optional breakfast price based on settings
     const optionalBreakfastPrice = settings?.breakfastPrice * numGuests * numNights
+
     const handleCheckin = () => {
-        if (!confirm) return
+        if (!confirm) return // If not confirmed payment, do nothing
         if (addBreakfast) {
+            // Update booking with added breakfast
             checkin({
                 bookingId, breakfast: {
                     hasBreakfast: true,
@@ -89,6 +106,7 @@ function CheckinBooking() {
                 }
             })
         } else {
+            // Update booking without breakfast
             checkin({ bookingId, breakfast: {} })
 
         }

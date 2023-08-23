@@ -13,7 +13,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../../ui/Spinner";
 import { getBooking } from "../../services/apiBookings";
-import { HiArrowDownOnSquare } from "react-icons/hi2";
+import { HiArrowDownOnSquare, HiArrowUpOnSquare } from "react-icons/hi2";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateBooking } from "../../services/apiBookings";
+import { toast } from "react-hot-toast";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -21,7 +24,18 @@ const HeadingGroup = styled.div`
   align-items: center;
 `;
 
+/**
+ * React component that displays the details of a booking and allows the user to check-in or check-out the booking.
+ *
+ * @component
+ * @example
+ * return (
+ *   <BookingDetail />
+ * )
+ */
 function BookingDetail() {
+    const queryClient = useQueryClient();
+
     const navigate = useNavigate()
     const moveBack = useMoveBack();
 
@@ -41,6 +55,17 @@ function BookingDetail() {
         queryKey: ["booking"],
         queryFn: () => getBooking(bookingId),
     });
+
+    const { isLoading: isCheckingOut, mutate: CheckOut } = useMutation({
+        mutationFn: (bookingId) => updateBooking(bookingId, { status: 'checked-out', }),
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({
+                query: ["bookings"]
+            })
+            toast.success(`Booking # ${data?.id} successfully checked out`);
+        },
+        onError: (error) => toast.error("there was an error while checking out")
+    })
 
     if (isLoading) return <Spinner />
 
@@ -70,6 +95,15 @@ function BookingDetail() {
                         onClick={() => navigate(`/checkin/${bookingId}`)}
                     >
                         Check In
+                    </Button>
+                }
+                {
+                    status === "checked-in" && <Button
+                        icon={<HiArrowUpOnSquare />}
+                        onClick={() => CheckOut(bookingId)}
+                        disabled={isCheckingOut}
+                    >
+                        Check Out
                     </Button>
                 }
             </ButtonGroup>
