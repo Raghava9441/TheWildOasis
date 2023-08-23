@@ -53,7 +53,7 @@ function CheckinBooking() {
 
 
     const { isLoading: isCheckingIn, mutate: checkin } = useMutation({
-        mutationFn: () => updateBooking(bookingId, { status: 'checked-in', isPaid: true }),
+        mutationFn: ({ bookingId, breakfast }) => updateBooking(bookingId, { status: 'checked-in', isPaid: true, ...breakfast }),
         onSuccess: (data) => {
             queryClient.invalidateQueries({
                 query: ["bookings"]
@@ -78,6 +78,21 @@ function CheckinBooking() {
     } = bookingData;
 
     const optionalBreakfastPrice = settings?.breakfastPrice * numGuests * numNights
+    const handleCheckin = () => {
+        if (!confirm) return
+        if (addBreakfast) {
+            checkin({
+                bookingId, breakfast: {
+                    hasBreakfast: true,
+                    extrasPrice: optionalBreakfastPrice,
+                    totalPrice: totalPrice + optionalBreakfastPrice
+                }
+            })
+        } else {
+            checkin({ bookingId, breakfast: {} })
+
+        }
+    }
     return (
         <>
             <Row type="horizontal">
@@ -109,7 +124,7 @@ function CheckinBooking() {
             </Box>
 
             <ButtonGroup>
-                <Button onClick={checkin} disabled={!confirmPaid} isLoading={isCheckingIn}>Check in booking #{bookingId}</Button>
+                <Button onClick={handleCheckin} disabled={!confirmPaid} isLoading={isCheckingIn}>Check in booking #{bookingId}</Button>
                 <Button variation="secondary" onClick={moveBack}>
                     Back
                 </Button>
