@@ -14,6 +14,7 @@ import AppLayout from './ui/AppLayout'
 import { Toaster } from 'react-hot-toast'
 import Booking from './pages/Booking'
 import CheckIn from './pages/CheckIn'
+import ProtectedRoutes from './ui/ProtectedRoutes'
 
 
 const queryClint = new QueryClient({
@@ -31,7 +32,7 @@ function App() {
 				<GlobalStyles />
 				<BrowserRouter>
 					<Routes>
-						<Route element={<AppLayout />}>
+						<Route element={<ProtectedRoutes><AppLayout /></ProtectedRoutes>}>
 							<Route index element={<Navigate replace to="dashboard" />} />
 							<Route path="dashboard" element={<Dashboard />} />
 							<Route path="bookings" element={<Bookings />} />
