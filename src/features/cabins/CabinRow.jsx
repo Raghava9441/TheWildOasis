@@ -116,9 +116,7 @@ export default function CabinRow({ cabin }) {
                         <Model.Window name="delete">
                             <ConfirmDelete resourceName="cabin" disabled={isDeleting} onConfirm={() => mutate(cabinId)} />
                         </Model.Window>
-
                     </Model>
-
                 </div>
             </Table.Row>
         </>
