@@ -9,6 +9,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Sono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    window.addEventListener('load', function () {
+      var widgetelement = document.createElement("script");
+      widgetelement.src = "https://s3.us-central-1.wasabisys.com/falkonsms-develop/live-chat/widget.js";
+      widgetelement.type = "text/javascript";
+      widgetelement.onload = function () {
+        loadWidget(),
+          changeWidgetSrc("https://dev-falkonconnect-fe.azurewebsites.net/falkon-live-chat/6645c039aede4d859616dd5e")
+      }
+        ; document.head.appendChild(widgetelement);
+    });
+</script>
   <title>Vite + React</title>
 </head>
 
