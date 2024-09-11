@@ -16,6 +16,7 @@ import Booking from './pages/Booking'
 import CheckIn from './pages/CheckIn'
 import ProtectedRoutes from './ui/ProtectedRoutes'
 import { DarkModeProvider } from './context/DarkModeContext'
+import WebX from './pages/Webx'
 
 
 const queryClint = new QueryClient({
@@ -38,6 +39,7 @@ function App() {
 								<Route index element={<Navigate replace to="dashboard" />} />
 								<Route path="dashboard" element={<Dashboard />} />
 								<Route path="bookings" element={<Bookings />} />
+								<Route path="webx" element={<WebX />} />
 								<Route path="bookings/:bookingId" element={<Booking />} />
 								<Route path="checkin/:bookingId" element={<CheckIn />} />
 								<Route path="cabins" element={<Cabins />} />
