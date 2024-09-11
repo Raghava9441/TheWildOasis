@@ -3,7 +3,6 @@ import { Application } from "@webex/embedded-app-sdk";
 
 function WebX() {
     const [sidebar, setSidebar] = useState(null);
-    const [calls, setCalls] = useState([]);
 
     useEffect(() => {
         const initWebexApp = async () => {
@@ -64,13 +63,6 @@ function WebX() {
             <button onClick={clearBadge}>Clear Badge</button>
             <button onClick={showErrorBadge}>Show Error Badge</button>
             <button onClick={showCountBadge}>Show Count Badge</button>
-
-            <h2>Active Calls</h2>
-            <ul>
-                {calls.map((call, index) => (
-                    <li key={index}>{JSON.stringify(call)}</li>
-                ))}
-            </ul>
         </div>
     );
 }
