@@ -49,11 +49,14 @@ function WebX() {
 
     const showCountBadge = async () => {
         if (sidebar) {
-            const isBadgeSet = await sidebar.showBadge({
-                badgeType: "count",
-                count: 5, // Example count
-            });
-            console.log("Count badge set:", isBadgeSet);
+            if (window.Webex !== undefined || window.webex !== undefined) {
+                const isBadgeSet = await sidebar.showBadge({
+                    badgeType: "count",
+                    count: 5, // Example count
+                });
+                console.log("Count badge set:", isBadgeSet);
+            }
+
         }
     };
 
