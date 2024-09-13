@@ -5,6 +5,7 @@ function WebX() {
     const [sidebar, setSidebar] = useState(null);
 
     useEffect(() => {
+
         const initWebexApp = async () => {
             try {
                 const app = new Application();
@@ -28,8 +29,9 @@ function WebX() {
                 console.error("Error initializing Webex application:", error);
             }
         };
-
-        initWebexApp();
+        if (window.Webex !== undefined || window.webex !== undefined) {
+            initWebexApp();
+        }
     }, []);
 
     const clearBadge = async () => {
@@ -49,26 +51,26 @@ function WebX() {
 
     const showCountBadge = async () => {
         if (sidebar) {
-            if (window.Webex !== undefined || window.webex !== undefined) {
-                alert("hey")
-                const isBadgeSet = await sidebar.showBadge({
-                    badgeType: "count",
-                    count: 5, // Example count
-                });
-                console.log("Count badge set:", isBadgeSet);
-            }
 
+            alert("hey")
+            const isBadgeSet = await sidebar.showBadge({
+                badgeType: "count",
+                count: 5, // Example count
+            });
+            console.log("Count badge set:", isBadgeSet);
         }
-    };
 
-    return (
-        <div className='d-flex flex-direction h-p-100 o-hidden justify-between'>
-            <h1>Webex Embedded App</h1>
-            <button onClick={clearBadge}>Clear Badge</button>
-            <button onClick={showErrorBadge}>Show Error Badge</button>
-            <button onClick={showCountBadge}>Show Count Badge</button>
-        </div>
-    );
+    }
+};
+
+return (
+    <div className='d-flex flex-direction h-p-100 o-hidden justify-between'>
+        <h1>Webex Embedded App</h1>
+        <button onClick={clearBadge}>Clear Badge</button>
+        <button onClick={showErrorBadge}>Show Error Badge</button>
+        <button onClick={showCountBadge}>Show Count Badge</button>
+    </div>
+);
 }
 
 export default WebX
