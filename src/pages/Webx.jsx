@@ -17,20 +17,14 @@ function WebX() {
                 console.log("sidebar:", sidebar)
                 setSidebar(sidebar);
 
-                // Handle call state changes
-                app.listen().then(() => {
-                    app.on("sidebar:callStateChanged", (call) => {
-                        console.log("Call state changed:", call);
-                    });
-                });
+                
 
             } catch (error) {
                 console.error("Error initializing Webex application:", error);
             }
         };
-        // if (window.Webex !== undefined || window.webex !== undefined) {
-            initWebexApp();
-        // }
+
+        initWebexApp();
     }, []);
 
     const clearBadge = async () => {
@@ -50,15 +44,11 @@ function WebX() {
 
     const showCountBadge = async () => {
         if (sidebar) {
-            // if (window.Webex !== undefined || window.webex !== undefined) {
-            alert("hey")
             const isBadgeSet = await sidebar.showBadge({
                 badgeType: "count",
                 count: 5, // Example count
             });
             console.log("Count badge set:", isBadgeSet);
-            // }
-
         }
     };
 
@@ -68,8 +58,10 @@ function WebX() {
             <button onClick={clearBadge}>Clear Badge</button>
             <button onClick={showErrorBadge}>Show Error Badge</button>
             <button onClick={showCountBadge}>Show Count Badge</button>
+
         </div>
     );
 }
 
 export default WebX
+
