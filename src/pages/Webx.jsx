@@ -28,9 +28,9 @@ function WebX() {
                 console.error("Error initializing Webex application:", error);
             }
         };
-        if (window.Webex !== undefined || window.webex !== undefined) {
+        // if (window.Webex !== undefined || window.webex !== undefined) {
             initWebexApp();
-        }
+        // }
     }, []);
 
     const clearBadge = async () => {
