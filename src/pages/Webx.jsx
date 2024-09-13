@@ -50,6 +50,7 @@ function WebX() {
     const showCountBadge = async () => {
         if (sidebar) {
             if (window.Webex !== undefined || window.webex !== undefined) {
+                alert("hey")
                 const isBadgeSet = await sidebar.showBadge({
                     badgeType: "count",
                     count: 5, // Example count
