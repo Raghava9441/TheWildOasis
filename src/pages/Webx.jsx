@@ -8,27 +8,49 @@ function WebX() {
     const urlParams = new URLSearchParams(window.location.search);
     console.log("urlParams:", urlParams)
 
+    const [webexApp, setWebexApp] = useState(false);
+
+
+    // useEffect(() => {
+    //     const initWebexApp = async () => {
+    //         try {
+    //             const app = new Application();
+
+    //             // Wait for the Webex application to be ready
+    //             await app.onReady();
+
+    //             // Access the sidebar
+    //             const sidebar = await app.context.getSidebar();
+    //             console.log("sidebar:", sidebar)
+    //             setSidebar(sidebar);
+
+
+
+    //         } catch (error) {
+    //             console.error("Error initializing Webex application:", error);
+    //         }
+    //     };
+    //     window.Webex
+    //     initWebexApp();
+    // }, []);
+
+
     useEffect(() => {
-        const initWebexApp = async () => {
-            try {
-                const app = new Application();
+        if (webexApp) {
+            return;
+        }
+        const _webexApp = new window.Webex.Application();
+        _webexApp.onReady().then((app) => {
+            console.log("Webex App Ready");
+            setWebexApp(_webexApp);
+            const sidebar = app.context.getSidebar();
+            setSidebar(sidebar);
+        });
+    }, [webexApp])
 
-                // Wait for the Webex application to be ready
-                await app.onReady();
-
-                // Access the sidebar
-                const sidebar = await app.context.getSidebar();
-                console.log("sidebar:", sidebar)
-                setSidebar(sidebar);
 
 
 
-            } catch (error) {
-                console.error("Error initializing Webex application:", error);
-            }
-        };
-        initWebexApp();
-    }, []);
 
     const clearBadge = async () => {
         if (sidebar) {
