@@ -10,6 +10,18 @@ function WebX() {
 
     const [webexApp, setWebexApp] = useState(false);
 
+    useEffect(() => {
+        if (webexApp) {
+            return;
+        }
+        const _webexApp = new window.Webex.Application();
+        _webexApp.onReady().then(() => {
+            console.log("Webex App Ready");
+            setWebexApp(_webexApp);
+        });
+    }, [webexApp])
+
+
 
     // useEffect(() => {
     //     const initWebexApp = async () => {
@@ -33,20 +45,6 @@ function WebX() {
     //     window.Webex
     //     initWebexApp();
     // }, []);
-
-
-    useEffect(() => {
-        if (webexApp) {
-            return;
-        }
-        const _webexApp = new window.Webex.Application();
-        _webexApp.onReady().then((app) => {
-            console.log("Webex App Ready");
-            setWebexApp(_webexApp);
-            const sidebar = app.context.getSidebar();
-            setSidebar(sidebar);
-        });
-    }, [webexApp])
 
 
 
