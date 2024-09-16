@@ -23,7 +23,8 @@ function WebX() {
                 console.error("Error initializing Webex application:", error);
             }
         };
-
+        
+          if(typeof window.WebX !== 'undefined')
         initWebexApp();
     }, []);
 
