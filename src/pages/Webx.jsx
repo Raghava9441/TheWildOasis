@@ -9,11 +9,12 @@ function WebX() {
             try {
                 const app = new Application();
                 console.log("app:", app.user.states.id)
-                if (app.user.states.id) {
-                    await app.onReady();
-                    const sidebar = await app.context.getSidebar();
-                    setSidebar(sidebar);
+                if (app.user.states.id === null) {
+                    return
                 }
+                await app.onReady();
+                const sidebar = await app.context.getSidebar();
+                setSidebar(sidebar);
             } catch (error) {
                 console.error("Error initializing Webex application:", error);
             }
