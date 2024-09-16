@@ -3,48 +3,28 @@ import { Application } from "@webex/embedded-app-sdk";
 
 function WebX() {
     const [sidebar, setSidebar] = useState(null);
-    const userAgent = window.navigator.userAgent
-    console.log("userAgent:", userAgent)
-    const urlParams = new URLSearchParams(window.location.search);
-    console.log("urlParams:", urlParams)
 
-    const [webexApp, setWebexApp] = useState(false);
+
+
+
+
 
     useEffect(() => {
-        if (webexApp) {
-            return;
-        }
-        const _webexApp = new window.Webex.Application();
-        _webexApp.onReady().then(() => {
-            console.log("Webex App Ready");
-            setWebexApp(_webexApp);
-        });
-    }, [webexApp])
-
-
-
-    // useEffect(() => {
-    //     const initWebexApp = async () => {
-    //         try {
-    //             const app = new Application();
-
-    //             // Wait for the Webex application to be ready
-    //             await app.onReady();
-
-    //             // Access the sidebar
-    //             const sidebar = await app.context.getSidebar();
-    //             console.log("sidebar:", sidebar)
-    //             setSidebar(sidebar);
-
-
-
-    //         } catch (error) {
-    //             console.error("Error initializing Webex application:", error);
-    //         }
-    //     };
-    //     window.Webex
-    //     initWebexApp();
-    // }, []);
+        const initWebexApp = async () => {
+            try {
+                const app = new Application();
+                console.log("app:", app)
+                if (app.isSDKConstructed) {
+                    await app.onReady();
+                    const sidebar = await app.context.getSidebar();
+                    setSidebar(sidebar);
+                }
+            } catch (error) {
+                console.error("Error initializing Webex application:", error);
+            }
+        };
+        initWebexApp();
+    }, []);
 
 
 
