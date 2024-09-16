@@ -4,28 +4,44 @@ import { useEffect, useState } from 'react'
 function WebX() {
     const [sidebar, setSidebar] = useState(null);
 
+    const [webexApp, setWebexApp] = useState(false);
+
     useEffect(() => {
-        const initWebexApp = async () => {
-            console.log(window.Webex)
-            try {
-                if (window.Webex && window.Webex.Application) {
+        if (webexApp) {
+            return;
+        }
+        const _webexApp = new window.Webex.Application();
+        _webexApp.onReady().then(() => {
+            console.log("Webex App Ready");
+            setWebexApp(_webexApp);
+            const sidebar = _webexApp.context.getSidebar();
+            setSidebar(sidebar);
+        });
+    }, [webexApp])
 
-                    const app = new window.Webex.Application();
 
-                    console.log("app:", app.user.states.id)
-                    if (app.user.states.id === null) {
-                        return
-                    }
-                    await app.onReady();
-                    const sidebar = await app.context.getSidebar();
-                    setSidebar(sidebar);
-                }
-            } catch (error) {
-                console.error("Error initializing Webex application:", error);
-            }
-        };
-        initWebexApp();
-    }, []);
+    // useEffect(() => {
+    //     const initWebexApp = async () => {
+    //         console.log(window.Webex)
+    //         try {
+    //             if (window.Webex && window.Webex.Application) {
+
+    //                 const app = new window.Webex.Application();
+
+    //                 console.log("app:", app.user.states.id)
+    //                 if (app.user.states.id === null) {
+    //                     return
+    //                 }
+    //                 await app.onReady();
+    //                 const sidebar = await app.context.getSidebar();
+    //                 setSidebar(sidebar);
+    //             }
+    //         } catch (error) {
+    //             console.error("Error initializing Webex application:", error);
+    //         }
+    //     };
+    //     initWebexApp();
+    // }, []);
 
 
 
