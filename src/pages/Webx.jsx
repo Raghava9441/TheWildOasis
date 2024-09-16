@@ -1,20 +1,25 @@
 import { useEffect, useState } from 'react'
-import { Application } from "@webex/embedded-app-sdk";
+// import * as Webex from "@webex/embedded-app-sdk";
 
 function WebX() {
     const [sidebar, setSidebar] = useState(null);
 
     useEffect(() => {
         const initWebexApp = async () => {
+            console.log(window.Webex)
             try {
-                const app = new Application();
-                console.log("app:", app.user.states.id)
-                if (app.user.states.id === null) {
-                    return
+                if (window.Webex && window.Webex.Application) {
+
+                    const app = new window.Webex.Application();
+
+                    console.log("app:", app.user.states.id)
+                    if (app.user.states.id === null) {
+                        return
+                    }
+                    await app.onReady();
+                    const sidebar = await app.context.getSidebar();
+                    setSidebar(sidebar);
                 }
-                await app.onReady();
-                const sidebar = await app.context.getSidebar();
-                setSidebar(sidebar);
             } catch (error) {
                 console.error("Error initializing Webex application:", error);
             }
