@@ -4,17 +4,12 @@ import { Application } from "@webex/embedded-app-sdk";
 function WebX() {
     const [sidebar, setSidebar] = useState(null);
 
-
-
-
-
-
     useEffect(() => {
         const initWebexApp = async () => {
             try {
                 const app = new Application();
-                console.log("app:", app)
-                if (app.isSDKConstructed) {
+                console.log("app:", app.user.states.id)
+                if (app.user.states.id) {
                     await app.onReady();
                     const sidebar = await app.context.getSidebar();
                     setSidebar(sidebar);
