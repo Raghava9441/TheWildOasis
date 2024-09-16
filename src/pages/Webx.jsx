@@ -3,6 +3,10 @@ import { Application } from "@webex/embedded-app-sdk";
 
 function WebX() {
     const [sidebar, setSidebar] = useState(null);
+    const userAgent = window.navigator.userAgent
+    console.log("userAgent:", userAgent)
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log("urlParams:", urlParams)
 
     useEffect(() => {
         const initWebexApp = async () => {
@@ -17,14 +21,12 @@ function WebX() {
                 console.log("sidebar:", sidebar)
                 setSidebar(sidebar);
 
-                
+
 
             } catch (error) {
                 console.error("Error initializing Webex application:", error);
             }
         };
-        
-          if(typeof window.WebX !== 'undefined')
         initWebexApp();
     }, []);
 
