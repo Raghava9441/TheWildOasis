@@ -4,20 +4,33 @@ import { useEffect, useState } from 'react'
 function WebX() {
     const [sidebar, setSidebar] = useState(null);
 
-    const [webexApp, setWebexApp] = useState(false);
-
     useEffect(() => {
-        if (webexApp) {
-            return;
-        }
-        const _webexApp = new window.Webex.Application();
-        _webexApp.onReady().then(() => {
-            console.log("Webex App Ready");
-            setWebexApp(_webexApp);
-            const sidebar = _webexApp.context.getSidebar();
-            setSidebar(sidebar);
-        });
-    }, [webexApp])
+        const initWebexApp = async () => {
+            try {
+                // if (window.Webex !== undefined ) {
+                const app = new window.Webex.Application();
+
+                // Wait for the Webex application to be ready
+                await app.onReady();
+
+                // Access the sidebar
+                const sidebar = await app.context.getSidebar();
+                console.log("sidebar:", sidebar)
+                setSidebar(sidebar);
+
+                // if (sidebar) {
+                //     const isBadgeSet = await setSidebar.showBadge({
+                //         badgeType: "count",
+                //         count: 2,
+                //     });
+                // }
+                // }
+            } catch (error) {
+                console.error("Error initializing Webex application:", error);
+            }
+        };
+        initWebexApp();
+    }, []);
 
 
     // useEffect(() => {
@@ -46,7 +59,6 @@ function WebX() {
 
 
 
-
     const clearBadge = async () => {
         if (sidebar) {
             await sidebar.clearBadge();
@@ -63,12 +75,19 @@ function WebX() {
     };
 
     const showCountBadge = async () => {
+        // if (sidebar) {
+        //     const isBadgeSet = await sidebar.showBadge({
+        //         badgeType: "count",
+        //         count: 5, // Example count
+        //     });
+        //     console.log("Count badge set:", isBadgeSet);
+        // }
+        
         if (sidebar) {
             const isBadgeSet = await sidebar.showBadge({
                 badgeType: "count",
-                count: 5, // Example count
+                count: 2,
             });
-            console.log("Count badge set:", isBadgeSet);
         }
     };
 
